@@ -16,10 +16,10 @@ window.onload = function() {
  * ゲーム管理クラス
  * @class
  * @extends Core
- * @param {オブジェクト} users ユーザ一覧 idで引ける
+ * @param {オブジェクト} players ユーザ一覧 idで引ける
  */
 var Game = Class.create(Core, {
-	users: null,
+	players: null,
 	
 	/**
 	 * コンストラクタ
@@ -28,6 +28,7 @@ var Game = Class.create(Core, {
 	 */
 	initialize: function() {
 		Core.call(this, config.width, config.height);
+		this.players = {};
 		this.changeScene(TitleScene);
 	},
 	

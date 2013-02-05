@@ -46,7 +46,7 @@ window.onload = function() {
 					if(dx * dx + dy * dy < r * r) {
 						console.log('入ってるよ');
 						touches[i].ready = true;
-						circle.counter++;
+						circ le.counter++;
 						circle.tl.scaleTo(0.9, 0.9, 2).scaleTo(1, 1, 1);
 						
 						// 全員入ったら

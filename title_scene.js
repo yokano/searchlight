@@ -36,8 +36,9 @@ var TitleScene = Class.create(Scene, {
 		this.addChild(message);
 		
 		// サーチライトを表示
-		var light = new Sprite(300, 300);
-		light.image = getCircle(150, 'white');
+		var r = 150;
+		var light = new Sprite(r * 2, r * 2);
+		light.image = getCircle(r, 'white');
 		light.y = 200;
 		light.opacity = 0.2;
 		light.dx = +5;
@@ -56,7 +57,17 @@ var TitleScene = Class.create(Scene, {
 		
 		// タップしたらログインシーンへ
 		this.addEventListener(Event.TOUCH_START, function() {
-			game.changeScene(LoginScene);
+			this.clearEventListener();
+			title.tl.fadeTo(0, config.fps / 3);
+			message.tl.clear().unloop().fadeTo(0, config.fps / 3);
+			light.clearEventListener();
+			light.tl
+				.fadeTo(1, config.fps,SIN_EASEOUT)
+				.and()
+				.moveTo(config.width / 2 - r, config.height / 2 - r, config.fps / 2, ELASTIC_EASEOUT)
+				.then(function() {
+					game.changeScene(LoginScene);
+				});
 		});
 	}
 });

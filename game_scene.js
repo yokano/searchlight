@@ -120,7 +120,7 @@ var Searchlight = Class.create(Sprite, {
 				p.x += game.width + 2 * this._r;
 			}
 		}
-				
+		
 		return p;
 	}
 });
