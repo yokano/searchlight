@@ -16,7 +16,7 @@ window.onload = function() {
  * ゲーム管理クラス
  * @class
  * @extends Core
- * @param {オブジェクト} players ユーザ一覧 idで引ける
+ * @param {オブジェクト} players ユーザ一覧 TouchEventのidで引ける
  */
 var Game = Class.create(Core, {
 	players: null,
@@ -29,18 +29,49 @@ var Game = Class.create(Core, {
 	initialize: function() {
 		Core.call(this, config.width, config.height);
 		this.players = {};
+		
+		// タイトルを表示
 		this.changeScene(TitleScene);
+		
+		// タッチイベントをシーンへ渡す
+		window.addEventListener('touchstart', function(e) {
+			game.currentScene.touchstart(e);
+		}, true);
+		window.addEventListener('touchend', function(e) {
+			game.currentScene.touchend(e);
+		}, true);
 	},
 	
 	/**
 	 * シーンを切り替える
 	 * @function
 	 * @memberOf Game
-	 * @param {クラス} 切り替え先のシーンクラス
+	 * @param {Scene} scene 切り替え先のシーンクラス
+	 * @param {真理値} pop イベントを継続させるならtrue イベントをリセットするならfalse 省略するとfalseになる
 	 */
-	changeScene: function(scene) {
-		this.popScene();
+	changeScene: function(scene, pop) {
+		pop = (pop == undefined) ? false : pop;
+		if(pop) {
+			this.popScene();
+		}
 		this.pushScene(scene());
+	},
+	
+	/**
+	 * 生きているプレイヤーの数を取得する
+	 * @function
+	 * @memberOf Game
+	 * @returns {数値} 生きているプレイヤーの数
+	 */
+	countLivings: function() {
+		var count = 0;
+		for(var id in this.players) {
+			var player = this.players[id];
+			if(player.alive) {
+				count++;
+			}
+		}
+		return count;
 	}
 });
 

@@ -20,14 +20,6 @@ var LoginScene = Class.create(Scene, {
 		this.backgroundColor = 'black';
 		this._loginCircle = new LoginCircle(150);
 		this.addChild(this._loginCircle);
-		
-		var self = this;
-		window.addEventListener('touchstart', function(e) {
-			self.touchstart(e);
-		});
-		window.addEventListener('touchend', function(e) {
-			self.touchend(e);
-		});
 	},
 	
 	/**
@@ -40,6 +32,7 @@ var LoginScene = Class.create(Scene, {
 		for(var i = 0; i < e.changedTouches.length; i++) {
 			var touch = e.changedTouches[i];
 			var player = new Player(touch, this._colors[touch.identifier % this._colors.length]);
+			this.addChild(player);
 			game.players[touch.identifier] = player;
 		}
 	},
@@ -55,6 +48,14 @@ var LoginScene = Class.create(Scene, {
 			this.removeChild(game.players[id]);
 			delete game.players[id];
 		}
+	},
+		
+	/**
+	 * シーン終了直前に実行する処理
+	 * @function
+	 * @memberOf LoginScene
+	 */
+	onexit: function() {
 	}
 });
 

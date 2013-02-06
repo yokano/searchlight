@@ -31,22 +31,21 @@ var Player = Class.create(Sprite, {
 		this.color = color;
 		var circle = getCircle(this._r, color);
 		this.image = circle;
-		
-		// アニメーション
-		var easing = CIRC_EASEOUT;
-		var time = config.fps / 3;
-		var self = this;
-		var f = function() {
-			this.x = this._touch.clientX - this._r;
-			this.y = this._touch.clientY - this._r;
-			self.tl.scaleTo(0, 0, 0).show().scaleTo(1.2, 1.2, time, easing).and().fadeTo(0, time, easing).then(f);
-		};
-		this.tl.scaleTo(1.2, 1.2, time, easing).and().fadeTo(0, time, easing).then(f);
-		
 		this.scaleX = 0;
 		this.scaleY = 0;
 		this.x = touch.clientX - this._r;
 		this.y = touch.clientY - this._r;
-		game.currentScene.addChild(this);
+		
+		// アニメーションの設定
+		var easing = CIRC_EASEOUT;
+		var time = config.fps / 3;
+		var self = this;
+		var animation = function() {
+			this.x = self._touch.clientX - this._r;
+			this.y = self._touch.clientY - this._r;
+			self.tl.scaleTo(0, 0, 0).show().scaleTo(1.2, 1.2, time, easing).and().fadeTo(0, time, easing).then(animation);
+		};
+		
+		animation();
 	}
 });
