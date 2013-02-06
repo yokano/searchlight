@@ -3,8 +3,11 @@
  * スポットライトを避けるシーン
  * @class
  * @extends Scene
+ * @property {数値} _wave 現在のウェーブ数
  */
 var GameScene = Class.create(Scene, {
+	_wave: 0,
+	
 	/**
 	 * コンストラクタ
 	 * @function
@@ -13,6 +16,7 @@ var GameScene = Class.create(Scene, {
 	initialize: function() {
 		Scene.call(this);
 		this.backgroundColor = 'black';
+		this._wave = 1;
 	},
 	
 	/**
@@ -37,8 +41,18 @@ var GameScene = Class.create(Scene, {
 	 * @see Pattern
 	 */
 	startPattern: function() {
-		var pattern = new Pattern();
+		var pattern = new Pattern(this._wave * 3);
 		this.addChild(pattern);
+	},
+	
+	/**
+	 * パターン終了時に呼び出される関数
+	 * @function
+	 * @memberOf GameScene
+	 */
+	patternHasFinished: function() {
+		this._wave++;
+		this.startPattern();
 	},
 	
 	/**

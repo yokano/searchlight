@@ -1,15 +1,36 @@
 /**
  * パターンクラス
  * サーチライトが出現するパターンの基底クラス
+ * @class
+ * @property {数値} _lightNum 生成したライトの数
+ * @property {数値} _count 動作完了したライトの数
+ * @param {数値} lightNum 生成するライトの数
  */
 var Pattern = Class.create(Group, {
-	initialize: function() {
+	_lightNum: 0,
+	_count: 0,
+	_callback: null,
+	initialize: function(lightNum, callback) {
 		Group.call(this);
+		this._lightNum = lightNum;
+		this._callback = callback;
 		
 		// ライトを追加
-		for(var i = 0; i < 30; i++) {
-			var light = new Searchlight(100);
+		for(var i = 0; i < this._lightNum; i++) {
+			var light = new Searchlight(200);
 			this.addChild(light);
+		}
+	},
+	
+	/**
+	 * ライトの動作が完了するたびに呼ばれる
+	 * @function
+	 * @memberOf Pattern
+	 */
+	lightWasMoved: function() {
+		this._count++;
+		if(this._lightNum <= this._count) {
+			this.scene.patternHasFinished();
 		}
 	}
 });
@@ -31,8 +52,8 @@ var Searchlight = Class.create(Sprite, {
 	 */
 	initialize: function(r) {
 		Sprite.call(this, r * 2, r * 2);
-		this._r = r;		
-
+		this._r = r;
+		
 		// 円の描画
 		this.image = getCircle(r, 'white');
 		
@@ -48,7 +69,9 @@ var Searchlight = Class.create(Sprite, {
 		} while(end.x == start.x || end.y == start.y);
 		
 		// 移動
-		this.tl.moveTo(end.x, end.y, game.fps * 10).removeFromScene();
+		this.tl.moveTo(end.x, end.y, game.fps * 10).removeFromScene().then(function() {
+			this.parentNode.lightWasMoved();
+		});
 		
 		// フレームごとに衝突判定
 		this.addEventListener(Event.ENTER_FRAME, this._checkCollision);
