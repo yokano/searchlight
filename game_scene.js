@@ -41,7 +41,7 @@ var GameScene = Class.create(Scene, {
 	 * @see Pattern
 	 */
 	startPattern: function() {
-		var pattern = new RandomLinearPattern(this._wave);
+		var pattern = new RandomHomingPattern(this._wave + 2);
 		this.addChild(pattern);
 	},
 	

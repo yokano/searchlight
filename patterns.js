@@ -42,8 +42,8 @@ var PatternBase = Class.create(Group, {
 		var p = {};
 		
 		// 四角形の左上に点をおく
-		p.x = -(r * 2);
-		p.y = -(r * 2);
+		p.x = -r * 2;
+		p.y = -r * 2;
 		
 		// 点を右に動かすか、下に動かすか決める
 		if(Math.random() < 0.5) {
@@ -83,29 +83,187 @@ var RandomLinearPattern = Class.create(PatternBase, {
 	initialize: function(lightNum, callback) {
 		PatternBase.call(this, lightNum, callback);
 		
-		// ライトを追加
 		var r = 200;
-		for(var i = 0; i < this._lightNum; i++) {
+		for(var i = 0; i < lightNum; i++) {
 			var light = new Searchlight(r);
 			
-			// 発生場所を設定
 			var start = this._getRandomizedPoint(r);
 			light.x = start.x;
 			light.y = start.y;
 			
-			// 移動先を設定
 			var end;
 			do {
 				end = this._getRandomizedPoint(r);
 			} while(end.x == light.x || end.y == light.y);
 			
-			// 移動
-			light.tl.moveTo(end.x, end.y, game.fps * 2).removeFromScene().then(function() {
+			light.tl.moveTo(end.x, end.y, game.fps * 3).removeFromScene().then(function() {
 				this.parentNode.lightWasMoved();
 			});
 			
 			this.addChild(light);
 		}
+	}
+});
+
+/**
+ * ランダムな箇所から垂直、または水平方向にライトが動くパターン
+ * @class
+ * @extends PatternBase
+ */
+var RandomLinearAcrossPattern = Class.create(PatternBase, {
+	initialize: function(lightNum, callback) {
+		PatternBase.call(this, lightNum, callback);
+		var r = 150;
+		for(var i = 0; i < lightNum; i++) {
+			var light = new Searchlight(r);
+			var start = this._getRandomizedPoint(r);
+			var end = {};
+			if(start.x == -r * 2) {
+				end.x = game.width + r * 2;
+				end.y = start.y;
+			} else if(start.x == game.width) {
+				end.x = -(r * 2);
+				end.y = start.y;
+			} else if(start.y == -r * 2) {
+				end.x = start.x;
+				end.y = game.height + r * 2;
+			} else if(start.y == game.height) {
+				end.x = start.x;
+				end.y = -(r * 2);
+			} else {
+				console.log('game', game.width, game.height);
+				console.log('outer', -r, game.width + r, -r, game.height + r);
+				console.log('start', start.x, start.y);
+				throw '不正な座標が設定されました';
+			}
+			
+			light.x = start.x;
+			light.y = start.y;
+			light.tl.moveTo(end.x, end.y, game.fps * 3).removeFromScene().then(function() {
+				this.parentNode.lightWasMoved();
+			});
+			
+			this.addChild(light);
+		}
+	}
+});
+
+/**
+ * ランダムな箇所から曲線を描きながら移動する
+ * @class
+ * @extends PatternBase
+ */
+//var RandomCurvePattern = Class.create(PatternBase, {
+//	initialize: function(lightNum, callback) {
+//		PatternBase.call(this, lightNum, callback);
+//		var r = 150;
+//		for(var i = 0; i < lightNum; i++) {
+//			
+//		}
+//	}
+//});
+
+var RandomWavePattern = Class.create(PatternBase, {
+	initialize: function(lightNum, callback) {
+		PatternBase.call(this, lightNum, callback);
+		 var r = 150;
+		 for(var i = 0; i < lightNum; i++) {
+		 	var light = new Searchlight(r);
+			
+			var start = this._getRandomizedPoint(r);
+			light.x = start.x;
+			light.y = start.y;
+			
+			light.dx = 0;
+			light.dy = 0;
+			if(start.x == -r * 2) {
+				light.dx = 1;
+			} else if(start.x == game.width) {
+				light.dx = -1;
+			} else if(start.y == -r * 2) {
+				light.dy = 1;
+			} else if(start.y == game.height) {
+				light.dy = -1;
+			} else {
+				throw '不正な座標が設定されました';
+			}
+			
+			if(Math.random() < 0.5) {
+				light.moveDirection = +1;
+			} else {
+				light.moveDirection = -1;
+			}
+			
+			light.addEventListener(Event.ENTER_FRAME, function() {
+				var dx = this.dx;
+				var dy = this.dy;
+				if(dx == 0) {
+					this.y = this.y + dy * 5;
+					this.x += Math.sin(game.frame / 10) * this.moveDirection * r / 10;
+					if(this.y < -r * 2 || game.height < this.y) {
+						this.parentNode.lightWasMoved();
+						this.parentNode.removeChild(this);
+					}
+				} else {
+					this.x =  this.x + dx * 5;
+					this.y += Math.sin(game.frame / 10) * r / 10;
+					if(this.x < -r * 2 || game.width < this.x) {
+						this.parentNode.lightWasMoved();
+						this.parentNode.removeChild(this);
+					}
+				}
+			});
+			
+			this.addChild(light);
+		 }
+	}
+});
+
+/**
+ * 追跡するライトが発生するパターン
+ * @class
+ * @extends
+ */
+var RandomHomingPattern = Class.create(PatternBase, {
+	initialize: function(lightNum) {
+		PatternBase.call(this, lightNum);
+		var r = 150;
+		for(var i = 0; i < lightNum; i++) {
+			var light = new Searchlight(r);
+			
+			var start = this._getRandomizedPoint(r);
+			light.x = start.x;
+			light.y = start.y;
+			
+			var idList = Object.keys(game.players);
+			var index = Math.floor(Math.random() * idList.length);
+			var targetId = idList[index];
+			light.target = game.players[targetId];
+			
+			light.addEventListener(Event.ENTER_FRAME, function() {
+				var cx = this.x + r;
+				var cy = this.y + r;
+
+				var dx = this.target._touch.clientX - cx;
+				var dy = this.target._touch.clientY - cy;
+
+				this.x += dx / (game.fps * 3);
+				this.y += dy / (game.fps * 3);
+			});
+			
+			this.addChild(light);
+		}
+	}
+});
+
+/**
+ * 壁で跳ね返るライトがランダムに現れるパターン
+ * @class
+ * @extends
+ */
+var RandomReflectionPattern = Class.create(PatternBase, {
+	initialize: function() {
+		PatternBase.call(this, lightNum);
 	}
 });
 
@@ -145,7 +303,7 @@ var Searchlight = Class.create(Sprite, {
 			
 			// 生きているプレイヤーだけ計算
 			if(player.alive) {
-			
+				
 				// 円の中心と指の距離を測定
 				var x = player._touch.clientX;
 				var y = player._touch.clientY;
