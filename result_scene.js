@@ -12,6 +12,14 @@ var ResultScene = Class.create(Scene, {
 	initialize: function() {
 		Scene.call(this);
 		this.backgroundColor = 'black';
+		
+		var message = new Label();
+		message.text = 'RESULT';
+		message.color = 'white';
+		message.font = '150px Iceland';
+		message.width = config.width;
+		message.y = config.height / 2 - 75;
+		this.addChild(message);
 	},
 	
 	/**
