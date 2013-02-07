@@ -20,6 +20,8 @@ var LoginScene = Class.create(Scene, {
 		this.backgroundColor = 'black';
 		this._loginCircle = new LoginCircle(150);
 		this.addChild(this._loginCircle);
+		
+		game.players = {};
 	},
 	
 	/**
